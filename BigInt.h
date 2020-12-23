@@ -150,7 +150,8 @@ class BigInt {
 		// returns the difference between 2 BigInts as a BigInt
 		BigInt diff (BigInt other) {
 			if (compareTo(other) == -1) {
-				throw "Negative result";
+				BigInt copy = BigInt(digits, SIZE);
+				return other.diff(copy);
 			}
 			else if (compareTo(other) == 0) {
 				BigInt res = BigInt();
