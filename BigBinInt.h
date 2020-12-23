@@ -15,10 +15,10 @@ class BigBinInt {
 			numSigDigits = 1;
 		}
 		
-		// Constructor with para as an array and its length
+		// Constructor with 2 parameters: an array and its length
 		BigBinInt (int arr[], int arr_length) {
 			if(arr_length > SIZE) {
-				printf("Wrong input!");
+				throw "Input array size out of range!";
 			}
 			else {
 				int count = 0;
@@ -30,15 +30,13 @@ class BigBinInt {
 				}
 				numSigDigits = arr_length - count;
 				if (numSigDigits == 0) {
-//					int digits[] = {};
 					digits[SIZE-1] = 0;
 					numSigDigits = 1;
 				}
 				else {
 					for (int i = 0; i < numSigDigits; i++) {
 						if (arr[count + i] >= 2) {
-							printf(">=2");
-							throw "Invalid input";
+							throw "Invalid digits input!";
 						}
 						digits[SIZE - numSigDigits + i] = arr[count + i];
 					}
@@ -46,20 +44,18 @@ class BigBinInt {
 			}
 		}
 		
-		// Constructor with para as an int
+		// Constructor with 1 parameter as an int
 		BigBinInt (int n) {
 			if (n < 0) {
 	            throw "Invalid input";
 	        } else if (n == 0) {
-//	        	int digits[SIZE] = {}; 
 	            numSigDigits = 1;
 	        } else {
 	            int count = 0;
 	            int index = SIZE - 1;
 	            while (n > 0) {
 	            	if (n % 10 >= 2) {
-	            		printf(">=2");
-	            		throw "Invalid input";
+	            		throw "Invalid digits input!";
 	            	}
 	                digits[index] = n % 10;
 	                n = n / 10;
@@ -70,7 +66,7 @@ class BigBinInt {
 	        }
 		}
 		
-		// Constructor with para as a char array (contains digits only)
+		// Constructor with 1 parameter as a char array (contains digits only)
 		BigBinInt (char* str) {
 			int count = 0;
 			for (int i = 0; str[i] != '\0'; i++) {
@@ -88,8 +84,7 @@ class BigBinInt {
 				for (int i = 0; i < numSigDigits; i++) {
 					int char_digit = (int) str[count + i] - 48;
 					if (char_digit >= 2 ) {
-						printf(">=2");
-						throw "Invalid input";
+						throw "Invalid digits input!";
 					}
 					digits[SIZE - numSigDigits + i] = char_digit;
 				}
@@ -101,7 +96,7 @@ class BigBinInt {
 			return numSigDigits;
 		}
 		
-		// print out the representation of the number
+		// Print out the representation of the number
 		void repr() {
 			if (numSigDigits == 1 && digits[SIZE-1] == 0) {
 				printf("0\n");
@@ -113,7 +108,7 @@ class BigBinInt {
 			}
 		}
 		
-		// returns 1 if bigger, -1 if smaller, 0 if equal
+		// Returns 1 if bigger, -1 if smaller, 0 if equal
 		int compareTo (BigBinInt other) {
 			if (numSigDigits > other.numSigDigits) {
 				return 1;
@@ -134,7 +129,7 @@ class BigBinInt {
 			}
 		}
 		
-		// returns sum of two 2 BigBinInts as a BigBinInt
+		// Returns sum of two 2 BigBinInts as a BigBinInt
 		BigBinInt add(BigBinInt other) {
 			int result[SIZE] = {};
 	        int index = SIZE - 1;
@@ -162,13 +157,15 @@ class BigBinInt {
 	            return res;
 	        }
 			else {
-	            printf("Over upperbound!");
+	            throw "Over upperbound!";
         	}
 		}
 		
+		// Returns the difference between 2 BigBinInts as a BigBinInt
 		BigBinInt diff (BigBinInt other) {
 			if (compareTo(other) == -1) {
-				printf("Negative result");
+				BigBinInt copy = BigBinInt (digits, SIZE);
+				return other.diff(copy);
 			}
 			else if (compareTo(other) == 0) {
 				BigBinInt res = BigBinInt();
@@ -201,6 +198,8 @@ class BigBinInt {
 			}
 		}
 		
+		// Helper method for multiplying two BigBinInts
+		// Returns product of a BigBinInt with 0, 1 or 10 as a BigBinInt
 		BigBinInt mul_digit(int n) {
 			if (n == 0) {
 				BigBinInt res = BigBinInt();
@@ -224,6 +223,7 @@ class BigBinInt {
 			}
 		}
 		
+		// Returns product of two BigBinInts as a BigBinInt
 		BigBinInt mul(BigBinInt other) {
 			BigBinInt resBigBinInt = BigBinInt();
 			for (int i = SIZE - 1; i > SIZE - numSigDigits -1; i--) {
