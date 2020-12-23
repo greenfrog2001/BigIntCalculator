@@ -13,10 +13,10 @@ class BigInt {
 			numSigDigits = 1;
 		}
 		
-		// Constructor with para as an array and its length
+		// Constructor with 2 parameters: an array and its length
 		BigInt (int arr[], int arr_length) {
 			if(arr_length > SIZE) {
-				printf("Wrong input!");
+				throw "Input array size out of range!";
 			}
 			else {
 				int count = 0;
@@ -28,15 +28,13 @@ class BigInt {
 				}
 				numSigDigits = arr_length - count;
 				if (numSigDigits == 0) {
-//					int digits[] = {};
 					digits[SIZE-1] = 0;
 					numSigDigits = 1;
 				}
 				else {
 					for (int i = 0; i < numSigDigits; i++) {
 						if (arr[count + i] >= 10) {
-							printf(">10");
-							throw "Invalid input";
+							throw "Invalid digits input!";
 						}
 						digits[SIZE - numSigDigits + i] = arr[count + i];
 					}
@@ -44,12 +42,11 @@ class BigInt {
 			}
 		}
 		
-		// Constructor with para as an int
+		// Constructor with 1 parameter as an int
 		BigInt (int n) {
 			if (n < 0) {
 	            throw "Invalid input";
 	        } else if (n == 0) {
-//	        	int digits[SIZE] = {}; 
 	            numSigDigits = 1;
 	        } else {
 	            int count = 0;
@@ -64,7 +61,7 @@ class BigInt {
 	        }
 		}
 		
-		// Constructor with para as a char array (contains digits only)
+		// Constructor with 1 parameter as a char array (contains digits only)
 		BigInt (char* str) {
 			int count = 0;
 			for (int i = 0; str[i] != '\0'; i++) {
@@ -146,13 +143,14 @@ class BigInt {
 	            return res;
 	        }
 			else {
-	            printf("Over upperbound!");
+	            throw "Over upperbound!";
         	}
 		}
 		
+		// returns the difference between 2 BigInts as a BigInt
 		BigInt diff (BigInt other) {
 			if (compareTo(other) == -1) {
-				printf("Negative result");
+				throw "Negative result";
 			}
 			else if (compareTo(other) == 0) {
 				BigInt res = BigInt();
@@ -204,7 +202,7 @@ class BigInt {
 				return res;
 			}
 			else {
-				printf("Over upperbound!");
+				throw "Over upperbound!";
 			}
 		}
 		
@@ -230,7 +228,6 @@ class BigInt {
 			while (temp < divisor) {
 				temp = temp * 10 + digits[++index];
 			}
-			// correct initial temp
 			int count = 0;
 			while (index < SIZE) {
 				result[index] = (temp / divisor);
@@ -242,7 +239,8 @@ class BigInt {
 			return res;
 		}
 		
-		// mod_2(), isPositive() and last_digit() are helper methods for converting methods		
+		// Helper method for converting methods		
+		// returns true if > 0, false if < 0
 		bool isPositive () {
 			BigInt zero = BigInt();
 			if (compareTo(zero) == 1) {
@@ -252,6 +250,7 @@ class BigInt {
 		}
 		
 		// Helper method for remainder() method
+		// returns a BigInt as an int value
 		int convertToInt () {
 			int res = 0;
 			for (int i = 0; i < numSigDigits; i++) {
@@ -265,6 +264,7 @@ class BigInt {
 		}
 		
 		// Helper method for DecToHex method
+		// returns the remainder when dividing BigInt to an int n
 		int remainder (int n) {
 			BigInt res = diff(divide_int(n).mul_digit(n));
 			int resInt = res.convertToInt();
