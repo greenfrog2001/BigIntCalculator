@@ -4,7 +4,7 @@
 
 class BigInt {
 	public:
-		static const int SIZE = 100; // Max size of array 
+		static const int SIZE = 1000; // Max size of array 
 		int digits[SIZE] = {}; // Create array of max size and full of zeros
 		int numSigDigits; // Number of significant digits 
 		
@@ -87,19 +87,18 @@ class BigInt {
 			return numSigDigits;
 		}
 		
-		// print out the representation of the number
+		// Print out the representation of the number
 		void repr() {
 			if (numSigDigits == 1 && digits[SIZE-1] == 0) {
-				printf("0\n");
+				printf("0");
 			} else {
 				for (int i = SIZE - numSigDigits; i < SIZE; i++) {
 					printf("%d", digits[i]);
 				}
-				printf("\n");
 			}
 		}
 		
-		// returns 1 if bigger, -1 if smaller, 0 if equal
+		// Returns 1 if bigger, -1 if smaller, 0 if equal
 		int compareTo (BigInt other) {
 			if (numSigDigits > other.numSigDigits) {
 				return 1;
@@ -120,7 +119,7 @@ class BigInt {
 			}
 		}
 		
-		// returns sum of two 2 BigInts as a BigInt
+		// Returns sum of two 2 BigInts as a BigInt
 		BigInt add(BigInt other) {
 			int result[SIZE] = {};
 	        int index = SIZE - 1;
@@ -147,7 +146,7 @@ class BigInt {
         	}
 		}
 		
-		// returns the difference between 2 BigInts as a BigInt
+		// Returns the difference between 2 BigInts as a BigInt
 		BigInt diff (BigInt other) {
 			if (compareTo(other) == -1) {
 				BigInt copy = BigInt(digits, SIZE);
@@ -241,7 +240,7 @@ class BigInt {
 		}
 		
 		// Helper method for converting methods		
-		// returns true if > 0, false if < 0
+		// Returns true if > 0, false if < 0
 		bool isPositive () {
 			BigInt zero = BigInt();
 			if (compareTo(zero) == 1) {
@@ -251,7 +250,7 @@ class BigInt {
 		}
 		
 		// Helper method for remainder() method
-		// returns a BigInt as an int value
+		// Returns a BigInt as an int value
 		int convertToInt () {
 			int res = 0;
 			for (int i = 0; i < numSigDigits; i++) {
@@ -265,7 +264,7 @@ class BigInt {
 		}
 		
 		// Helper method for DecToHex method
-		// returns the remainder when dividing BigInt to an int n
+		// Returns the remainder when dividing BigInt to an int n
 		int remainder (int n) {
 			BigInt res = diff(divide_int(n).mul_digit(n));
 			int resInt = res.convertToInt();
