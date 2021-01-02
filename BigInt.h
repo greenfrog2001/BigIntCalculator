@@ -6,7 +6,8 @@ class BigInt {
 	public:
 		static const int SIZE = 1000; // Max size of array 
 		int digits[SIZE] = {}; // Create array of max size and full of zeros
-		int numSigDigits; // Number of significant digits 
+		int numSigDigits; // Number of significant digits
+		bool isNegative = false; 
 		
 		// Constructor with empty, represents 0
 		BigInt () {
@@ -14,11 +15,12 @@ class BigInt {
 		}
 		
 		// Constructor with 2 parameters: an array and its length
-		BigInt (int arr[], int arr_length) {
+		BigInt (int arr[], int arr_length, bool is_negative=false) {
 			if(arr_length > SIZE) {
 				throw "Input array size out of range!";
 			}
 			else {
+				isNegative = is_negative;
 				int count = 0;
 				for (int i = 0; i < arr_length; i++) {
 					if (arr[i] != 0) {
@@ -44,11 +46,13 @@ class BigInt {
 		
 		// Constructor with 1 parameter as an int
 		BigInt (int n) {
-			if (n < 0) {
-	            throw "Invalid input";
-	        } else if (n == 0) {
+			if (n == 0) {
 	            numSigDigits = 1;
 	        } else {
+	        	if (n < 0) {
+	        		isNegative = true;
+	        		n *= -1;
+				}
 	            int count = 0;
 	            int index = SIZE - 1;
 	            while (n > 0) {
@@ -69,6 +73,10 @@ class BigInt {
 					break;
 				}
 				count ++;
+			}
+			if (str[count] == '-') {
+				isNegative = true;
+				count++;
 			}
 			numSigDigits = strlen(str) - count;
 			if (numSigDigits == 0) {
@@ -92,6 +100,9 @@ class BigInt {
 			if (numSigDigits == 1 && digits[SIZE-1] == 0) {
 				printf("0");
 			} else {
+				if (isNegative) {
+					printf("-");
+				}
 				for (int i = SIZE - numSigDigits; i < SIZE; i++) {
 					printf("%d", digits[i]);
 				}
@@ -121,29 +132,69 @@ class BigInt {
 		
 		// Returns sum of two 2 BigInts as a BigInt
 		BigInt add(BigInt other) {
-			int result[SIZE] = {};
-	        int index = SIZE - 1;
-	        int carry = 0;
-	        while (index > 0) {
-	        	int sum = digits[index] + other.digits[index] + carry;
-	        	if (sum >= 10) {
-	        		result[index] = sum - 10;
-	            	carry = 1;
-	            	index--;
-	        	}
+			
+			if (isNegative && other.isNegative) {
+				BigInt copy1 = BigInt(digits, SIZE);
+				BigInt copy2 = BigInt(digits, SIZE);
+				BigInt rev_res = copy1.add(copy2);
+				BigInt res = BigInt(rev_res.digits, SIZE, true);
+				return res;
+			}
+			else if (isNegative) {
+				BigInt copy1 = BigInt(digits, SIZE);
+				BigInt rev_res = copy1.diff(other);
+				if (compareTo(other) > 0) {
+					BigInt res = BigInt(rev_res.digits, SIZE, true);
+					return res;
+				}
+				else if (compareTo(other) == 0) {
+					BigInt res = BigInt();
+					return res;
+				}
 				else {
-	            	carry = 0;
-	            	result[index] = sum;
-	            	index--;
+					return rev_res;
+				}
+			}
+			else if (other.isNegative) {
+				BigInt copy2 = BigInt(other.digits, SIZE);
+				BigInt rev_res = diff(copy2);
+				if (compareTo(other) > 0) {
+					return rev_res;
+				}
+				else if (compareTo(other) == 0) {
+					BigInt res = BigInt();
+					return res;
+				}
+				else {
+					BigInt res = BigInt(rev_res.digits, SIZE, true);
+					return res;
+				}
+			}
+			else {
+				int result[SIZE] = {};
+		        int index = SIZE - 1;
+		        int carry = 0;
+		        while (index > 0) {
+		        	int sum = digits[index] + other.digits[index] + carry;
+		        	if (sum >= 10) {
+		        		result[index] = sum - 10;
+		            	carry = 1;
+		            	index--;
+		        	}
+					else {
+		            	carry = 0;
+		            	result[index] = sum;
+		            	index--;
+		        	}
+		        }
+		        if (carry == 0) {
+		            BigInt res = BigInt (result, SIZE);
+		            return res;
+		        }
+				else {
+		            throw "Over upperbound!";
 	        	}
 	        }
-	        if (carry == 0) {
-	            BigInt res = BigInt (result, SIZE);
-	            return res;
-	        }
-			else {
-	            throw "Over upperbound!";
-        	}
 		}
 		
 		// Returns the difference between 2 BigInts as a BigInt
@@ -176,6 +227,40 @@ class BigInt {
 				BigInt resBigInt = BigInt(result, SIZE);
 				return resBigInt;
 			}
+		}
+		
+		// Returns the subtraction of this BigInt to other BigInt
+		BigInt subtract (BigInt other) {
+			BigInt res;
+			if (compareTo(other) == 0) {
+				res = BigInt();
+			}
+			else if (isNegative && other.isNegative) {
+				if (compareTo(other) > 0) {
+					res = BigInt(diff(other).digits, SIZE, true);
+				}
+				else {
+					res = BigInt(diff(other).digits, SIZE);
+				}
+			}
+			else if ((!isNegative) && other.isNegative) {
+				BigInt copy2 = BigInt(other.digits, SIZE);	
+				res = BigInt(add(copy2).digits, SIZE);
+			}
+			else if (isNegative && (!other.isNegative)) {
+				BigInt copy1 = BigInt(digits, SIZE);
+				res = BigInt(copy1.add(other).digits, SIZE, true);
+			}
+			else {
+				if (compareTo(other) > 0) {
+					res = BigInt(diff(other).digits, SIZE);
+				}
+				else {
+					res = BigInt(diff(other).digits, SIZE, true);
+				}
+			}
+			BigInt resBigInt = BigInt (res.digits, SIZE, res.isNegative);
+			return resBigInt;
 		}
 		
 		// Helper method for multiplying two BigInts
@@ -217,7 +302,14 @@ class BigInt {
 				}
 				resBigInt = resBigInt.add(otherProd);
 			}
-			return resBigInt;
+			if ((isNegative && other.isNegative) || ( (!isNegative) && (!other.isNegative) ) ) {
+				return resBigInt;
+			}
+			else {
+				BigInt res = BigInt(resBigInt.digits, SIZE, true);
+				return res;
+			}
+			
 		}
 		
 		// Helper method for remainder() method
@@ -243,14 +335,15 @@ class BigInt {
 		// Returns true if > 0, false if < 0
 		bool isPositive () {
 			BigInt zero = BigInt();
-			if (compareTo(zero) == 1) {
-				return true;
+			if (isNegative || compareTo(zero) == 0) {
+				return false;
 			}
-			return false;
+			return true;
 		}
 		
 		// Helper method for remainder() method
 		// Returns a BigInt as an int value
+		// Note that this method applies only for positive big int
 		int convertToInt () {
 			int res = 0;
 			for (int i = 0; i < numSigDigits; i++) {
@@ -265,6 +358,7 @@ class BigInt {
 		
 		// Helper method for DecToHex method
 		// Returns the remainder when dividing BigInt to an int n
+		// Note that this method applies only for positive big int
 		int remainder (int n) {
 			BigInt res = diff(divide_int(n).mul_digit(n));
 			int resInt = res.convertToInt();
