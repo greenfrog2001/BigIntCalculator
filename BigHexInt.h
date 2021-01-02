@@ -4,7 +4,7 @@
 
 class BigHexInt {
 	public:
-		static const int SIZE = 100; // Max size of array 
+		static const int SIZE = 1000; // Max size of array 
 		int digits[SIZE] = {}; // Array of max size and full of zeros that will contain the digits
 		int numSigDigits; // Number of significant digits
 		int converted_digits[SIZE] = {}; // int-converted digits array for calculating
@@ -89,7 +89,7 @@ class BigHexInt {
 		// print out the representation of the number
 		void repr() {
 			if (numSigDigits == 1 && digits[SIZE-1] == 0) {
-				printf("0\n");
+				printf("0");
 			} else {
 				for (int i = SIZE - numSigDigits; i < SIZE; i++) {
 					if (digits[i] >= 0 && digits[i] < 10) {
@@ -99,7 +99,6 @@ class BigHexInt {
 						printf("%c", digits[i]);
 					}
 				}
-				printf("\n");
 			}
 		}
 		
@@ -172,7 +171,8 @@ class BigHexInt {
 		
 		BigHexInt diff (BigHexInt other) {
 			if (compareTo(other) == -1) {
-				printf("Negative result");
+				BigHexInt copy = BigHexInt (digits, SIZE);
+				return other.diff(copy);
 			}
 			else if (compareTo(other) == 0) {
 				BigHexInt res = BigHexInt();
@@ -255,42 +255,4 @@ class BigHexInt {
 			}
 			return res;
 		}
-//		
-//		BigInt divide_int (int divisor) {
-//			int result[SIZE] = {};
-//			int index = SIZE - numSigDigits;
-//			int temp = digits[index];
-//			while (temp < divisor) {
-//				temp = temp * 10 + digits[++index];
-//			}
-//			// correct initial temp
-//			int count = 0;
-//			while (index < SIZE) {
-//				result[index] = (temp / divisor);
-//				temp = (temp % divisor) * 10 + digits[++index];
-//				count ++;
-//			}
-//			
-//			BigInt res = BigInt(result, SIZE);
-//			return res;
-//		}
-//		
-//		// mod_2(), isPositive() and last_digit() are helper methods for convertToBinary() method
-//		int mod_2() {
-//			int res = digits[SIZE-1] % 2;
-//			return res;
-//		}
-//		
-//		bool isPositive () {
-//			BigInt zero = BigInt();
-//			if (compareTo(zero) == 1) {
-//				return true;
-//			}
-//			return false;
-//		}
-//		
-//		int last_digit () {
-//			int res = digits[SIZE-1];
-//			return res;
-//		}
 };
