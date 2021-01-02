@@ -82,14 +82,11 @@ int main() {
 							printf("\033[A\33[2K");
 						}
 						printf("\nPhep tru:\n");
-						BigInt resBigInt = bi1.diff(bi2);
+						BigInt resBigInt = bi1.subtract(bi2);
 						bi1.repr();
 						printf(" - ");
 						bi2.repr();
 						printf(" = ");
-						if (bi1.compareTo(bi2) < 0) {
-							printf("-");
-						}
 						resBigInt.repr();
 						break;
 					}
