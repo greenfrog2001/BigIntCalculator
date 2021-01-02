@@ -6,7 +6,7 @@
 
 class BigBinInt {
 	public:
-		static const int SIZE = 100; // Max size of array 
+		static const int SIZE = 1000; // Max size of array 
 		int digits[SIZE] = {}; // Create array of max size and full of zeros
 		int numSigDigits; // Number of significant digits 
 		
@@ -99,12 +99,11 @@ class BigBinInt {
 		// Print out the representation of the number
 		void repr() {
 			if (numSigDigits == 1 && digits[SIZE-1] == 0) {
-				printf("0\n");
+				printf("0");
 			} else {
 				for (int i = SIZE - numSigDigits; i < SIZE; i++) {
 					printf("%d", digits[i]);
 				}
-				printf("\n");
 			}
 		}
 		
