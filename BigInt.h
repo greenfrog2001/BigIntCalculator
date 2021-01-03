@@ -14,7 +14,8 @@ class BigInt {
 			numSigDigits = 1;
 		}
 		
-		// Constructor with 2 parameters: an array and its length
+		// Constructor with 2 parameters: an array, its length and an optional 
+		// parameter is_negative being set default to false 
 		BigInt (int arr[], int arr_length, bool is_negative=false) {
 			if(arr_length > SIZE) {
 				throw "Input array size out of range!";
@@ -109,7 +110,7 @@ class BigInt {
 			}
 		}
 		
-		// Returns 1 if bigger, -1 if smaller, 0 if equal
+		// Returns 1 if absolute value is bigger, -1 if smaller, 0 if equal
 		int compareTo (BigInt other) {
 			if (numSigDigits > other.numSigDigits) {
 				return 1;
@@ -308,8 +309,7 @@ class BigInt {
 			else {
 				BigInt res = BigInt(resBigInt.digits, SIZE, true);
 				return res;
-			}
-			
+			}	
 		}
 		
 		// Helper method for remainder() method
