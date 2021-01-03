@@ -2,25 +2,26 @@
 
 #pragma once
 
-#include "Convert.h"
-
 class BigBinInt {
 	public:
 		static const int SIZE = 1000; // Max size of array 
 		int digits[SIZE] = {}; // Create array of max size and full of zeros
 		int numSigDigits; // Number of significant digits 
+		bool isNegative = false;
 		
 		// Constructor with empty, represents 0
 		BigBinInt () {
 			numSigDigits = 1;
 		}
 		
-		// Constructor with 2 parameters: an array and its length
-		BigBinInt (int arr[], int arr_length) {
+		// Constructor with 2 parameters: an array, its length and an optional 
+		// parameter is_negative being set default to false
+		BigBinInt (int arr[], int arr_length, bool is_negative = false) {
 			if(arr_length > SIZE) {
 				throw "Input array size out of range!";
 			}
 			else {
+				isNegative = is_negative;
 				int count = 0;
 				for (int i = 0; i < arr_length; i++) {
 					if (arr[i] != 0) {
@@ -46,11 +47,13 @@ class BigBinInt {
 		
 		// Constructor with 1 parameter as an int
 		BigBinInt (int n) {
-			if (n < 0) {
-	            throw "Invalid input";
-	        } else if (n == 0) {
-	            numSigDigits = 1;
+			if (n == 0) {
+				numSigDigits = 1;
 	        } else {
+	        	if (n < 0) {
+	        		isNegative = true;
+	        		n *= -1;
+				}
 	            int count = 0;
 	            int index = SIZE - 1;
 	            while (n > 0) {
@@ -74,6 +77,10 @@ class BigBinInt {
 					break;
 				}
 				count ++;
+			}
+			if (str[count] == '-') {
+				isNegative = true;
+				count++;
 			}
 			numSigDigits = strlen(str) - count;
 			if (numSigDigits == 0) {
@@ -101,13 +108,16 @@ class BigBinInt {
 			if (numSigDigits == 1 && digits[SIZE-1] == 0) {
 				printf("0");
 			} else {
+				if (isNegative) {
+					printf("-");
+				}
 				for (int i = SIZE - numSigDigits; i < SIZE; i++) {
 					printf("%d", digits[i]);
 				}
 			}
 		}
 		
-		// Returns 1 if bigger, -1 if smaller, 0 if equal
+		// Returns 1 if absolute value is bigger, -1 if smaller, 0 if equal
 		int compareTo (BigBinInt other) {
 			if (numSigDigits > other.numSigDigits) {
 				return 1;
@@ -130,34 +140,74 @@ class BigBinInt {
 		
 		// Returns sum of two 2 BigBinInts as a BigBinInt
 		BigBinInt add(BigBinInt other) {
-			int result[SIZE] = {};
-	        int index = SIZE - 1;
-	        int carry = 0;
-	        while (index > 0) {
-	        	int sum = digits[index] + other.digits[index] + carry;
-	        	if (sum == 2) {
-	        		result[index] = 0;
-	            	carry = 1;
-	            	index--;
-	        	}
-	        	else if (sum == 3) {
-	        		result[index] = 1;
-	        		carry = 1;
-	        		index--;
+			
+			if (isNegative && other.isNegative) {
+				BigBinInt copy1 = BigBinInt(digits, SIZE);
+				BigBinInt copy2 = BigBinInt(digits, SIZE);
+				BigBinInt rev_res = copy1.add(copy2);
+				BigBinInt res = BigBinInt(rev_res.digits, SIZE, true);
+				return res;
+			}
+			else if (isNegative) {
+				BigBinInt copy1 = BigBinInt(digits, SIZE);
+				BigBinInt rev_res = copy1.diff(other);
+				if (compareTo(other) > 0) {
+					BigBinInt res = BigBinInt(rev_res.digits, SIZE, true);
+					return res;
+				}
+				else if (compareTo(other) == 0) {
+					BigBinInt res = BigBinInt();
+					return res;
 				}
 				else {
-	            	carry = 0;
-	            	result[index] = sum;
-	            	index--;
+					return rev_res;
+				}
+			}
+			else if (other.isNegative) {
+				BigBinInt copy2 = BigBinInt(other.digits, SIZE);
+				BigBinInt rev_res = diff(copy2);
+				if (compareTo(other) > 0) {
+					return rev_res;
+				}
+				else if (compareTo(other) == 0) {
+					BigBinInt res = BigBinInt();
+					return res;
+				}
+				else {
+					BigBinInt res = BigBinInt(rev_res.digits, SIZE, true);
+					return res;
+				}
+			}
+			else {
+				int result[SIZE] = {};
+		        int index = SIZE - 1;
+		        int carry = 0;
+		        while (index > 0) {
+		        	int sum = digits[index] + other.digits[index] + carry;
+		        	if (sum == 2) {
+		        		result[index] = 0;
+		            	carry = 1;
+		            	index--;
+		        	}
+		        	else if (sum == 3) {
+		        		result[index] = 1;
+		        		carry = 1;
+		        		index--;
+					}
+					else {
+		            	carry = 0;
+		            	result[index] = sum;
+		            	index--;
+		        	}
+		        }
+		        if (carry == 0) {
+		            BigBinInt res = BigBinInt (result, SIZE);
+		            return res;
+		        }
+				else {
+		            throw "Over upperbound!";
 	        	}
 	        }
-	        if (carry == 0) {
-	            BigBinInt res = BigBinInt (result, SIZE);
-	            return res;
-	        }
-			else {
-	            throw "Over upperbound!";
-        	}
 		}
 		
 		// Returns the difference between 2 BigBinInts as a BigBinInt
@@ -195,6 +245,40 @@ class BigBinInt {
 				BigBinInt res = BigBinInt(result, SIZE);
 				return res;
 			}
+		}
+		
+		// Returns the subtraction of this BigBinInt to other BigBinInt
+		BigBinInt subtract (BigBinInt other) {
+			BigBinInt res;
+			if (compareTo(other) == 0) {
+				res = BigBinInt();
+			}
+			else if (isNegative && other.isNegative) {
+				if (compareTo(other) > 0) {
+					res = BigBinInt(diff(other).digits, SIZE, true);
+				}
+				else {
+					res = BigBinInt(diff(other).digits, SIZE);
+				}
+			}
+			else if ((!isNegative) && other.isNegative) {
+				BigBinInt copy2 = BigBinInt(other.digits, SIZE);	
+				res = BigBinInt(add(copy2).digits, SIZE);
+			}
+			else if (isNegative && (!other.isNegative)) {
+				BigBinInt copy1 = BigBinInt(digits, SIZE);
+				res = BigBinInt(copy1.add(other).digits, SIZE, true);
+			}
+			else {
+				if (compareTo(other) > 0) {
+					res = BigBinInt(diff(other).digits, SIZE);
+				}
+				else {
+					res = BigBinInt(diff(other).digits, SIZE, true);
+				}
+			}
+			BigBinInt resBigBinInt = BigBinInt (res.digits, SIZE, res.isNegative);
+			return resBigBinInt;
 		}
 		
 		// Helper method for multiplying two BigBinInts
@@ -235,6 +319,12 @@ class BigBinInt {
 				otherProd.repr();
 				resBigBinInt = resBigBinInt.add(otherProd);
 			}
-			return resBigBinInt;
+			if ((isNegative && other.isNegative) || ( (!isNegative) && (!other.isNegative) ) ) {
+				return resBigBinInt;
+			}
+			else {
+				BigBinInt res = BigBinInt(resBigBinInt.digits, SIZE, true);
+				return res;
+			}
 		}
 };
