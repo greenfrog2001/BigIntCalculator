@@ -10,7 +10,7 @@ BigBinInt DecToBin (BigInt x) {
 	int size = x.SIZE;
 	int result[size] = {};
 	int index = 0;
-	BigInt copy = BigInt(x.digits, size); // copy of x
+	BigInt copy = BigInt(x.digits, size); // positive copy of x
 
 	do {
 		result[index] = copy.remainder(2);
@@ -27,7 +27,7 @@ BigBinInt DecToBin (BigInt x) {
 			result[i] = 0;
 		}
 	}
-	BigBinInt res = BigBinInt(result, size);
+	BigBinInt res = BigBinInt(result, size, x.isNegative);
 	return res;
 }
 
@@ -35,7 +35,7 @@ BigHexInt DecToHex (BigInt x) {
 	int size = x.SIZE;
 	int result[size] = {};
 	int index = 0;
-	BigInt copy = BigInt (x.digits, size); // copy of x
+	BigInt copy = BigInt (x.digits, size); // positive copy of x
 
 	do {
 		result[index] = copy.remainder(16);
@@ -59,13 +59,13 @@ BigHexInt DecToHex (BigInt x) {
 		}
 	}
 	
-	BigHexInt res = BigHexInt(result, size);
+	BigHexInt res = BigHexInt(result, size, x.isNegative);
 	return res;
 }
 
 BigInt BinToDec (BigBinInt x) {
 	int size = x.SIZE;
-	BigInt copy = BigInt(x.digits, size);
+	BigInt copy = BigInt(x.digits, size); // positive copy of x
 	BigInt res = BigInt();
 	BigInt base = BigInt("1");
 	while (copy.isPositive()) {
@@ -73,7 +73,8 @@ BigInt BinToDec (BigBinInt x) {
 		copy = copy.divide_int(10);
 		base = base.mul_digit(2);
 	}
-	return res;
+	BigInt resBigInt = BigInt(res.digits, size, x.isNegative);
+	return resBigInt;
 }
 
 BigInt HexToDec (BigHexInt x) {
@@ -88,7 +89,8 @@ BigInt HexToDec (BigHexInt x) {
 		BigInt mulBy = BigInt(sixteens);
 		res = res.add(mulBy.mul_digit(x.converted_digits[size-1-i]));
 	}
-	return res;
+	BigInt resBigInt = BigInt(res.digits, size, x.isNegative);
+	return resBigInt;
 }
 
 BigHexInt BinToHex (BigBinInt x) {
