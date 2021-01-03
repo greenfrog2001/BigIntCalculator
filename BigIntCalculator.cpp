@@ -152,14 +152,11 @@ int main() {
 							printf("\033[A\33[2K");
 						}
 						printf("\nPhep tru:\n");
-						BigBinInt resBigBinInt = bbi1.diff(bbi2);
+						BigBinInt resBigBinInt = bbi1.subtract(bbi2);
 						bbi1.repr();
 						printf(" - ");
 						bbi2.repr();
 						printf(" = ");
-						if (bbi1.compareTo(bbi2) < 0) {
-							printf("-");
-						}
 						resBigBinInt.repr();
 						break;
 					}
@@ -225,14 +222,11 @@ int main() {
 							printf("\033[A\33[2K");
 						}
 						printf("\nPhep tru:\n");
-						BigHexInt resBigHexInt = bhi1.diff(bhi2);
+						BigHexInt resBigHexInt = bhi1.subtract(bhi2);
 						bhi1.repr();
 						printf(" - ");
 						bhi2.repr();
 						printf(" = ");
-						if (bhi1.compareTo(bhi2) < 0) {
-							printf("-");
-						}
 						resBigHexInt.repr();
 						break;
 					}
